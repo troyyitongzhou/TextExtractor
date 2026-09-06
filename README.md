@@ -25,7 +25,7 @@ The selected Whisper model is downloaded on first use, so that first transcripti
 
 <img src="docs/textextractor-demo.gif" alt="TextExtractor usage demo" width="720">
 
-The demo uses synthetic transcript text and shows the basic workflow: enter a video URL, start extraction, monitor progress, review the transcript, and download the preferred output format.
+The demo uses synthetic transcript text and shows the basic workflow: enter a video URL, start extraction, follow the current stage, review the transcript, and download the preferred output format.
 
 ## Source Checkout Requirements
 

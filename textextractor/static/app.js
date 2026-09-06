@@ -7,8 +7,6 @@ const fileInput = document.querySelector('#file');
 const fileLabel = document.querySelector('#file-label');
 const statusSection = document.querySelector('#status-section');
 const resultSection = document.querySelector('#result-section');
-const progressBar = document.querySelector('#progress-bar');
-const progressValue = document.querySelector('#progress-value');
 const stage = document.querySelector('#stage');
 const modelDownloadHint = document.querySelector('#model-download-hint');
 const errorMessage = document.querySelector('#error-message');
@@ -17,7 +15,6 @@ const preview = document.querySelector('#transcript-preview');
 const resultMeta = document.querySelector('#result-meta');
 const downloadLinks = document.querySelector('#download-links');
 const copyButton = document.querySelector('#copy-button');
-const progressTrack = document.querySelector('#progress-track');
 const dropZone = document.querySelector('#drop-zone');
 const themeButton = document.querySelector('#theme-button');
 const soundButton = document.querySelector('#sound-button');
@@ -283,23 +280,39 @@ function setSubmitting(submitting) {
   submitButtons.forEach((button) => { button.disabled = submitting; });
 }
 
-function showError(message) {
-  errorMessage.textContent = message;
-  errorMessage.classList.remove('hidden');
+function setStatus(label, busy) {
+  jobTitle.textContent = label;
+  form.setAttribute('aria-busy', String(busy));
+  if (!busy) modelDownloadHint.classList.add('hidden');
 }
 
-function updateProgress(job) {
-  const value = Math.max(0, Math.min(100, job.progress || 0));
-  progressBar.style.width = `${value}%`;
-  progressValue.textContent = `${value}%`;
-  progressTrack.setAttribute('aria-valuenow', String(value));
+function showError(message, statusLabel = 'Error') {
+  setStatus(statusLabel, false);
+  errorMessage.textContent = message;
+  errorMessage.classList.remove('hidden');
+  statusSection.classList.remove('hidden');
+}
+
+function updateStatus(job) {
+  const terminalLabel = job.status === 'failed'
+    ? 'Failed'
+    : (job.status === 'cancelled' || job.status === 'canceled' ? 'Cancelled' : null);
   stage.textContent = job.stage || 'Processing';
-  const showModelDownloadHint = value === 30 && job.stage === 'Transcribing with Apple GPU';
+  if (terminalLabel) {
+    setStatus(terminalLabel, false);
+  } else if (job.status === 'complete') {
+    setStatus('Completed', false);
+  } else {
+    setStatus('Working…', true);
+  }
+  const showModelDownloadHint = !terminalLabel
+    && job.status !== 'complete'
+    && job.stage === 'Transcribing with Apple GPU';
   modelDownloadHint.classList.toggle('hidden', !showModelDownloadHint);
-  jobTitle.textContent = 'Processing';
 }
 
 function showResult(job, shouldScroll = true) {
+  setStatus('Completed', false);
   resultSection.classList.remove('hidden');
   preview.value = job.preview || '';
   const minutes = job.duration ? Math.max(1, Math.round(job.duration / 60)) : 0;
@@ -325,19 +338,22 @@ async function pollJob(jobId) {
     const response = await fetch(`/jobs/${jobId}`);
     if (!response.ok) throw new Error('Unable to read the job status.');
     const job = await response.json();
-    updateProgress(job);
+    updateStatus(job);
     if (job.status === 'complete') {
       clearInterval(pollTimer);
       showResult(job);
     } else if (job.status === 'failed') {
       clearInterval(pollTimer);
       setSubmitting(false);
-      showError(job.error || 'Processing failed.');
+      showError(job.error || 'Processing failed.', 'Failed');
+    } else if (job.status === 'cancelled' || job.status === 'canceled') {
+      clearInterval(pollTimer);
+      setSubmitting(false);
     }
   } catch (error) {
     clearInterval(pollTimer);
     setSubmitting(false);
-    showError(error.message);
+    showError(error.message, 'Stopped');
   }
 }
 
@@ -345,6 +361,7 @@ form.addEventListener('submit', async (event) => {
   event.preventDefault();
   clearInterval(pollTimer);
   setSubmitting(false);
+  statusSection.classList.add('hidden');
   errorMessage.classList.add('hidden');
   resultSection.classList.add('hidden');
 
@@ -359,19 +376,19 @@ form.addEventListener('submit', async (event) => {
 
   statusSection.classList.remove('hidden');
   setSubmitting(true);
-  updateProgress({ progress: 0, stage: 'Submitting' });
+  updateStatus({ status: 'submitting', stage: 'Submitting' });
   statusSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
 
   try {
     const response = await fetch('/jobs', { method: 'POST', body: new FormData(form) });
     const payload = await response.json();
     if (!response.ok) throw new Error(payload.error || 'Submission failed.');
-    updateProgress(payload);
+    updateStatus(payload);
     pollTimer = setInterval(() => pollJob(payload.id), 1200);
     await pollJob(payload.id);
   } catch (error) {
     setSubmitting(false);
-    showError(error.message);
+    showError(error.message, 'Stopped');
   }
 });
 

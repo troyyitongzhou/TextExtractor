@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "textextractor"
-version = "0.1.1"
+version = "0.1.2"
 description = "Local Apple silicon browser UI for transcribing Bilibili and media files with MLX Whisper."
 readme = "README.md"
 requires-python = ">=3.12"

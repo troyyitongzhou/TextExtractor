@@ -273,9 +273,6 @@ input[type="file"] { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .status-body { padding-bottom: 23px; }
 .status-heading, .result-heading { display: flex; justify-content: space-between; align-items: flex-end; gap: 20px; }
 h2 { margin: 0; color: var(--ink-strong); font-size: 27px; line-height: 1.15; }
-#progress-value { font-size: 13px; font-variant-numeric: tabular-nums; }
-.progress-track { height: 9px; margin-top: 22px; overflow: hidden; border: 1px solid #b6c0c5; border-radius: 2px; background: #e2e7e9; box-shadow: inset 0 1px 2px rgba(38, 55, 64, .12); }
-#progress-bar { width: 0; height: 100%; background: linear-gradient(90deg, #2f9b55, #61c66f); transition: width 280ms ease; }
 #stage, #result-meta { margin: 12px 0 0; color: #66727a; font: 13px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; }
 .status-hint { margin: 7px 0 0; color: #786746; font: 12px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; }
 .error { padding: 12px 14px; border-left: 3px solid var(--error); background: #f8e9e7; color: var(--error) !important; }
@@ -330,7 +327,6 @@ body.theme-dark {
 .theme-dark .drop-zone strong { color: #eceff1; }
 .theme-dark .drop-zone span { color: #aeb5bd; }
 .theme-dark .secondary, .theme-dark .download-link { border-color: #59616d; background: linear-gradient(#272c33, #20242a); color: #e5e8eb; box-shadow: 0 2px 0 #0c0e11; }
-.theme-dark .progress-track { border-color: #515a63; background: #282d33; }
 .theme-dark .error { background: #342120; }
 
 @media (max-width: 820px) {

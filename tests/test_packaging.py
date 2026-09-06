@@ -37,13 +37,46 @@ class PackagingTests(unittest.TestCase):
             template,
         )
         self.assertIn(
-            "value === 30 && job.stage === 'Transcribing with Apple GPU'",
+            "job.status !== 'complete'",
+            script,
+        )
+        self.assertIn(
+            "&& job.stage === 'Transcribing with Apple GPU'",
             script,
         )
         self.assertIn(
             "modelDownloadHint.classList.toggle('hidden', !showModelDownloadHint)",
             script,
         )
+
+    def test_processing_uses_status_only_and_accessible_busy_state(self):
+        repository_root = Path(__file__).resolve().parents[1]
+        template = (repository_root / "templates/index.html").read_text(encoding="utf-8")
+        script = (repository_root / "static/app.js").read_text(encoding="utf-8")
+        styles = (repository_root / "static/style.css").read_text(encoding="utf-8")
+
+        self.assertIn('aria-live="polite"', template)
+        self.assertIn('<form id="transcribe-form" class="instrument-panel" aria-busy="false">', template)
+        self.assertIn('<h2 id="job-title">Working…</h2>', template)
+        self.assertNotIn('role="progressbar"', template)
+        self.assertNotIn('aria-valuenow', template)
+        self.assertNotIn('id="progress-value"', template)
+        self.assertNotIn('id="progress-track"', template)
+        self.assertNotIn('id="progress-bar"', template)
+
+        self.assertIn("function setStatus(label, busy)", script)
+        self.assertIn("form.setAttribute('aria-busy', String(busy))", script)
+        self.assertIn("setStatus('Working…', true)", script)
+        self.assertIn("setStatus('Completed', false)", script)
+        self.assertIn("showError(job.error || 'Processing failed.', 'Failed')", script)
+        self.assertIn("showError(error.message, 'Stopped')", script)
+        self.assertIn("? 'Failed'", script)
+        self.assertIn("? 'Cancelled'", script)
+        self.assertIn("job.status === 'cancelled' || job.status === 'canceled'", script)
+        self.assertNotIn("progressBar", script)
+        self.assertNotIn("progressValue", script)
+        self.assertNotIn("progressTrack", script)
+        self.assertNotIn(".progress-track", styles)
 
     def test_top_bar_controls_do_not_play_ui_sounds(self):
         repository_root = Path(__file__).resolve().parents[1]

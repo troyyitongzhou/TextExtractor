@@ -37,7 +37,7 @@
         <h1 id="page-title">TextExtractor</h1>
       </header>
 
-      <form id="transcribe-form" class="instrument-panel">
+      <form id="transcribe-form" class="instrument-panel" aria-busy="false">
         <div class="instrument-bar" aria-hidden="true">
           <span></span>
           <span class="sequence-meta">
@@ -108,19 +108,17 @@
       </form>
     </section>
 
-    <section id="status-section" class="instrument-panel status-section hidden" aria-live="polite">
+    <section id="status-section" class="instrument-panel status-section hidden" aria-live="polite" aria-atomic="false">
       <div class="instrument-bar">
         <span></span>
         <span class="sequence-meta">
           <svg aria-hidden="true" viewBox="0 0 28 18"><path d="M3 3h17l5 6-5 6H3l4-6-4-6Z" fill="currentColor"/></svg>
-          <span id="progress-value">0%</span>
         </span>
       </div>
       <div class="instrument-body status-body">
         <div class="status-heading">
-            <h2 id="job-title">Processing</h2>
+            <h2 id="job-title">Working…</h2>
         </div>
-        <div id="progress-track" class="progress-track" role="progressbar" aria-label="Processing progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progress-bar"></div></div>
         <p id="stage">Waiting</p>
         <p id="model-download-hint" class="status-hint hidden">First run: downloading the Whisper model may take several minutes.</p>
         <p id="error-message" class="error hidden"></p>

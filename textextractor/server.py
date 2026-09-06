@@ -72,6 +72,12 @@ model_lock = Lock()
 def update_job(job_id: str, **changes) -> None:
     with jobs_lock:
         if job_id in jobs:
+            if "progress" in changes:
+                current = jobs[job_id].get("progress") or 0
+                changes["progress"] = max(
+                    0,
+                    min(100, max(current, changes["progress"])),
+                )
             jobs[job_id].update(changes)
 
 
@@ -249,7 +255,6 @@ def download_video(job_id: str, url: str, directory: Path) -> tuple[Path, str]:
 
 
 def transcribe_with_mlx(
-    job_id: str,
     source_path: Path,
     model_name: str,
     language: str | None,
@@ -263,23 +268,12 @@ def transcribe_with_mlx(
     transcribe_module = importlib.import_module("mlx_whisper.transcribe")
     original_tqdm = transcribe_module.tqdm.tqdm
 
-    class JobProgress(original_tqdm):
+    class SilentProgress(original_tqdm):
         def __init__(self, *args, **kwargs):
             kwargs["disable"] = True
             super().__init__(*args, **kwargs)
 
-        def update(self, amount=1):
-            result = super().update(amount)
-            if self.total:
-                ratio = min(1.0, self.n / self.total)
-                update_job(
-                    job_id,
-                    stage="Transcribing with Apple GPU",
-                    progress=min(92, 30 + round(ratio * 62)),
-                )
-            return result
-
-    transcribe_module.tqdm.tqdm = JobProgress
+    transcribe_module.tqdm.tqdm = SilentProgress
     try:
         return mlx_whisper.transcribe(
             str(source_path),
@@ -303,19 +297,31 @@ def transcribe_job(job_id: str) -> None:
     title = job.get("title") or "Transcript"
 
     try:
-        update_job(job_id, status="running", stage="Preparing media", progress=3)
+        update_job(
+            job_id,
+            status="running",
+            stage="Preparing media",
+            progress=3,
+        )
         if job["source_type"] == "url":
             source_path, title = download_video(job_id, job["url"], directory)
             update_job(job_id, title=title, progress=20)
         elif source_path is None or not source_path.exists():
             raise RuntimeError("The uploaded file is missing.")
 
-        update_job(job_id, stage="Loading MLX model", progress=23)
+        update_job(
+            job_id,
+            stage="Loading MLX model",
+            progress=23,
+        )
         with model_lock:
-            update_job(job_id, stage="Transcribing with Apple GPU", progress=30)
+            update_job(
+                job_id,
+                stage="Transcribing with Apple GPU",
+                progress=30,
+            )
             language = None if job["requested_language"] == "auto" else job["requested_language"]
             result = transcribe_with_mlx(
-                job_id,
                 source_path,
                 job["model"],
                 language,
@@ -335,7 +341,11 @@ def transcribe_job(job_id: str) -> None:
         if not segments:
             raise RuntimeError("No clear speech was detected. Confirm that the media contains audible speech.")
 
-        update_job(job_id, stage="Generating transcript", progress=95)
+        update_job(
+            job_id,
+            stage="Generating transcript",
+            progress=95,
+        )
         metadata = {
             "title": title,
             "language": result.get("language"),
