@@ -2,6 +2,8 @@
 .conda/
 __pycache__/
 *.py[cod]
+build/
+*.egg-info/
 .DS_Store
 .pytest_cache/
 data/

@@ -6,6 +6,19 @@ It runs locally on Apple silicon using MLX Whisper and exports plain text, times
 
 <img src="docs/textextractor-ui.png" alt="TextExtractor interface" width="720">
 
+## Install
+
+TextExtractor officially supports Apple silicon Macs running macOS 14 Sonoma or newer. MLX Whisper requires Apple silicon, native ARM Python, and macOS 14+.
+
+```bash
+brew install troyyitongzhou/tap/textextractor
+textextractor
+```
+
+The command starts a local server and opens the browser UI at [http://127.0.0.1:8765](http://127.0.0.1:8765). Use `textextractor --port 8899` to choose another port, or `textextractor --no-browser` to start without opening a browser.
+
+The selected Whisper model is downloaded on first use. The `small` model is the recommended default, especially on 8 GB Macs.
+
 ## Demo
 
 <img src="docs/textextractor-demo.gif" alt="TextExtractor usage demo" width="720">
@@ -24,7 +37,7 @@ Install FFmpeg if needed:
 brew install ffmpeg
 ```
 
-## Run
+## Source Checkout
 
 ```bash
 ./start.command
@@ -32,7 +45,7 @@ brew install ffmpeg
 
 Then open [http://127.0.0.1:8765](http://127.0.0.1:8765).
 
-The launcher creates a local Python 3.12 Conda environment and installs the required packages. The selected Whisper model is downloaded on first use.
+The source launcher creates a local Python 3.12 Conda environment and installs the required packages. It keeps generated transcripts under `data/jobs/`, which is excluded from Git.
 
 Paste a public Bilibili URL or choose a local media file, select the language and model, then click **Extract text**. When processing completes, copy the transcript or download it as TXT, timestamped TXT, SRT, VTT, or JSON.
 

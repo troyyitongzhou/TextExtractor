@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TextExtractor</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="terminal-rim">
+    <div class="terminal-actions">
+      <button id="sound-button" class="icon-button" type="button" aria-label="Mute button sounds" title="Mute button sounds">
+        <svg class="sound-on-icon" aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/>
+          <path d="M16.2 8.2a5 5 0 0 1 0 7.6m2.5-10.1a8.5 8.5 0 0 1 0 12.6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"/>
+        </svg>
+        <svg class="sound-off-icon" aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor"/>
+          <path d="m17 9 4 4m0-4-4 4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"/>
+        </svg>
+      </button>
+      <button id="theme-button" class="icon-button" type="button" aria-label="Use dark mode" title="Use dark mode">
+        <svg class="moon-icon" aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M19.2 15.3A8 8 0 0 1 8.7 4.8 8 8 0 1 0 19.2 15.3Z" fill="currentColor"/>
+        </svg>
+        <svg class="sun-icon" aria-hidden="true" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="3.6" fill="none" stroke="currentColor" stroke-width="1.8"/>
+          <path d="M12 2.7v2.1M12 19.2v2.1M2.7 12h2.1M19.2 12h2.1M5.4 5.4l1.5 1.5M17.1 17.1l1.5 1.5M18.6 5.4l-1.5 1.5M6.9 17.1l-1.5 1.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.8"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="home-shell">
+    <section class="workspace" aria-labelledby="page-title">
+      <header class="intro-block">
+        <h1 id="page-title">TextExtractor</h1>
+      </header>
+
+      <form id="transcribe-form" class="instrument-panel">
+        <div class="instrument-bar" aria-hidden="true">
+          <span></span>
+          <span class="sequence-meta">
+            <svg viewBox="0 0 28 18"><path d="M3 3h17l5 6-5 6H3l4-6-4-6Z" fill="currentColor"/></svg>
+          </span>
+        </div>
+        <div class="instrument-body">
+          <div class="source-tabs" role="tablist" aria-label="Media source">
+            <button class="tab active" type="button" role="tab" aria-selected="true" data-source="url">Video URL</button>
+            <button class="tab" type="button" role="tab" aria-selected="false" data-source="file">Local file</button>
+          </div>
+
+          <input id="source-type" name="source_type" type="hidden" value="url">
+          <div id="url-panel" class="source-panel">
+            <label for="url">Video URL</label>
+            <input id="url" name="url" type="url" placeholder="https://www.bilibili.com/video/..." autocomplete="url">
+            <button class="primary submit-button" type="submit"><i aria-hidden="true"></i>Extract text</button>
+          </div>
+
+          <div id="file-panel" class="source-panel hidden">
+            <label id="drop-zone" class="drop-zone" for="file">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14v5h14v-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/></svg>
+              <strong id="file-label">Choose a video or audio file</strong>
+              <span>or drop it here · 5 GB max</span>
+            </label>
+            <input id="file" name="file" type="file" accept="video/*,audio/*">
+            <button class="primary submit-button" type="submit"><i aria-hidden="true"></i>Extract text</button>
+          </div>
+
+          <div class="settings-row">
+            <div class="settings-field">
+              <span>Language</span>
+              <div class="custom-select" data-select>
+                <input name="language" type="hidden" value="auto">
+                <button class="select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span>Auto detect</span>
+                  <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/></svg>
+                </button>
+                <div class="select-menu" role="listbox" hidden>
+                  <button type="button" role="option" data-value="auto" aria-selected="true">Auto detect</button>
+                  <button type="button" role="option" data-value="en" aria-selected="false">English</button>
+                  <button type="button" role="option" data-value="zh" aria-selected="false">Chinese</button>
+                  <button type="button" role="option" data-value="ja" aria-selected="false">Japanese</button>
+                  <button type="button" role="option" data-value="ko" aria-selected="false">Korean</button>
+                  <button type="button" role="option" data-value="fr" aria-selected="false">French</button>
+                  <button type="button" role="option" data-value="de" aria-selected="false">German</button>
+                  <button type="button" role="option" data-value="es" aria-selected="false">Spanish</button>
+                </div>
+              </div>
+            </div>
+            <div class="settings-field">
+              <span>Model</span>
+              <div class="custom-select" data-select>
+                <input name="model" type="hidden" value="small">
+                <button class="select-trigger" type="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span>Small · Recommended</span>
+                  <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"/></svg>
+                </button>
+                <div class="select-menu" role="listbox" hidden>
+                  <button type="button" role="option" data-value="small" aria-selected="true">Small · Recommended</button>
+                  <button type="button" role="option" data-value="medium" aria-selected="false">Medium · More accurate</button>
+                  <button type="button" role="option" data-value="large-v3" aria-selected="false">Large v3 · Most accurate</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </section>
+
+    <section id="status-section" class="instrument-panel status-section hidden" aria-live="polite">
+      <div class="instrument-bar">
+        <span></span>
+        <span class="sequence-meta">
+          <svg aria-hidden="true" viewBox="0 0 28 18"><path d="M3 3h17l5 6-5 6H3l4-6-4-6Z" fill="currentColor"/></svg>
+          <span id="progress-value">0%</span>
+        </span>
+      </div>
+      <div class="instrument-body status-body">
+        <div class="status-heading">
+            <h2 id="job-title">Processing</h2>
+        </div>
+        <div id="progress-track" class="progress-track" role="progressbar" aria-label="Processing progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div id="progress-bar"></div></div>
+        <p id="stage">Waiting</p>
+        <p id="error-message" class="error hidden"></p>
+      </div>
+    </section>
+
+    <section id="result-section" class="instrument-panel result-section hidden">
+      <div class="instrument-bar result-bar" aria-hidden="true">
+        <span></span>
+        <span class="sequence-meta">
+          <svg viewBox="0 0 28 18"><path d="M3 3h17l5 6-5 6H3l4-6-4-6Z" fill="currentColor"/></svg>
+        </span>
+      </div>
+      <div class="instrument-body">
+        <div class="result-heading">
+          <div>
+            <h2>Transcript</h2>
+            <p id="result-meta"></p>
+          </div>
+          <button id="copy-button" class="secondary" type="button">Copy all</button>
+        </div>
+        <textarea id="transcript-preview" readonly aria-label="Transcript"></textarea>
+        <div id="download-links" class="downloads" aria-label="Download formats"></div>
+      </div>
+    </section>
+  </main>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

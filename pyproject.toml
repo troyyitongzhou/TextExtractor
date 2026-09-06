@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "textextractor"
+version = "0.1.0"
+description = "Local Apple silicon browser UI for transcribing Bilibili and media files with MLX Whisper."
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+authors = [{ name = "Troy Yitong Zhou" }]
+dependencies = [
+  "Flask>=3.1,<4",
+  "mlx-whisper>=0.4.3,<1",
+  "yt-dlp[curl-cffi,default]>=2026.8.19",
+]
+
+[project.scripts]
+textextractor = "textextractor.server:main"
+
+[tool.setuptools]
+packages = ["textextractor"]
+
+[tool.setuptools.package-data]
+textextractor = [
+  "templates/*.html",
+  "static/*.css",
+  "static/*.js",
+]

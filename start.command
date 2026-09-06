@@ -38,4 +38,5 @@ if ! "$PYTHON" -c 'from importlib.metadata import version; from packaging.versio
 fi
 
 echo "Starting TextExtractor..."
-exec "$PYTHON" app.py
+export TEXTEXTRACTOR_JOB_ROOT="$PWD/data/jobs"
+exec "$PYTHON" -m textextractor --no-browser
