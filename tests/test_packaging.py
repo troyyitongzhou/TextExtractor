@@ -14,6 +14,19 @@ class PackagingTests(unittest.TestCase):
         self.assertTrue(package_files.joinpath("static/app.js").is_file())
         self.assertTrue(package_files.joinpath("static/style.css").is_file())
 
+    def test_source_and_packaged_assets_match(self):
+        repository_root = Path(__file__).resolve().parents[1]
+        package_root = repository_root / "textextractor"
+        for relative_path in (
+            Path("templates/index.html"),
+            Path("static/app.js"),
+            Path("static/style.css"),
+        ):
+            self.assertEqual(
+                (repository_root / relative_path).read_bytes(),
+                (package_root / relative_path).read_bytes(),
+            )
+
     def test_cli_accepts_port_and_no_browser(self):
         args = server.build_parser().parse_args(["--port", "8899", "--no-browser"])
         self.assertEqual(args.port, 8899)

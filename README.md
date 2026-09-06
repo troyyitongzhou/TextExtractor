@@ -15,9 +15,11 @@ brew install troyyitongzhou/tap/textextractor
 textextractor
 ```
 
+Homebrew installs the required Python runtime, FFmpeg, and pinned Python dependencies.
+
 The command starts a local server and opens the browser UI at [http://127.0.0.1:8765](http://127.0.0.1:8765). Use `textextractor --port 8899` to choose another port, or `textextractor --no-browser` to start without opening a browser.
 
-The selected Whisper model is downloaded on first use. The `small` model is the recommended default, especially on 8 GB Macs.
+The selected Whisper model is downloaded on first use, so that first transcription needs an internet connection and takes longer to start. The `small` model is the recommended default, especially on an 8 GB M1 Mac.
 
 ## Demo
 
@@ -25,7 +27,7 @@ The selected Whisper model is downloaded on first use. The `small` model is the 
 
 The demo uses synthetic transcript text and shows the basic workflow: enter a video URL, start extraction, monitor progress, review the transcript, and download the preferred output format.
 
-## Requirements
+## Source Checkout Requirements
 
 - An Apple silicon Mac
 - Conda (Anaconda or Miniconda)
@@ -66,7 +68,16 @@ TextExtractor uses `yt-dlp` with browser impersonation enabled only for Bilibili
 - The web server listens only on `127.0.0.1`.
 - Transcription runs locally on the Apple GPU.
 - Downloaded or uploaded media is deleted after processing.
-- Generated transcripts remain under `data/jobs/` and are excluded from Git.
+- Homebrew installs keep generated transcripts under `~/Library/Application Support/TextExtractor/jobs/`.
+- Source checkouts keep generated transcripts under `data/jobs/`; that directory is excluded from Git.
+
+## Uninstall
+
+```bash
+brew uninstall textextractor
+```
+
+Uninstalling the formula does not remove your transcripts. Delete `~/Library/Application Support/TextExtractor/` separately if you no longer need them.
 
 ## Test
 

@@ -10,6 +10,10 @@ readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"
 authors = [{ name = "Troy Yitong Zhou" }]
+classifiers = [
+  "Operating System :: MacOS :: MacOS X",
+  "Programming Language :: Python :: 3.12",
+]
 dependencies = [
   "Flask>=3.1,<4",
   "mlx-whisper>=0.4.3,<1",
@@ -18,6 +22,10 @@ dependencies = [
 
 [project.scripts]
 textextractor = "textextractor.server:main"
+
+[project.urls]
+Homepage = "https://github.com/troyyitongzhou/TextExtractor"
+Repository = "https://github.com/troyyitongzhou/TextExtractor"
 
 [tool.setuptools]
 packages = ["textextractor"]
