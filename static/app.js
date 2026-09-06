@@ -10,6 +10,7 @@ const resultSection = document.querySelector('#result-section');
 const progressBar = document.querySelector('#progress-bar');
 const progressValue = document.querySelector('#progress-value');
 const stage = document.querySelector('#stage');
+const modelDownloadHint = document.querySelector('#model-download-hint');
 const errorMessage = document.querySelector('#error-message');
 const jobTitle = document.querySelector('#job-title');
 const preview = document.querySelector('#transcript-preview');
@@ -270,6 +271,8 @@ function updateProgress(job) {
   progressValue.textContent = `${value}%`;
   progressTrack.setAttribute('aria-valuenow', String(value));
   stage.textContent = job.stage || 'Processing';
+  const showModelDownloadHint = value === 30 && job.stage === 'Transcribing with Apple GPU';
+  modelDownloadHint.classList.toggle('hidden', !showModelDownloadHint);
   jobTitle.textContent = 'Processing';
 }
 

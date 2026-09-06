@@ -277,6 +277,7 @@ h2 { margin: 0; color: var(--ink-strong); font-size: 27px; line-height: 1.15; }
 .progress-track { height: 9px; margin-top: 22px; overflow: hidden; border: 1px solid #b6c0c5; border-radius: 2px; background: #e2e7e9; box-shadow: inset 0 1px 2px rgba(38, 55, 64, .12); }
 #progress-bar { width: 0; height: 100%; background: linear-gradient(90deg, #2f9b55, #61c66f); transition: width 280ms ease; }
 #stage, #result-meta { margin: 12px 0 0; color: #66727a; font: 13px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; }
+.status-hint { margin: 7px 0 0; color: #786746; font: 12px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif; }
 .error { padding: 12px 14px; border-left: 3px solid var(--error); background: #f8e9e7; color: var(--error) !important; }
 
 .result-bar { background: linear-gradient(#536b76, #374a53); }
@@ -313,6 +314,7 @@ body.theme-dark {
 .theme-dark .moon-icon { display: none; }
 .theme-dark .sun-icon { display: block; }
 .theme-dark #stage, .theme-dark #result-meta { color: #bdc3cb; }
+.theme-dark .status-hint { color: #d3ba85; }
 .theme-dark .source-tabs { border-color: #4a525b; background: #20242a; }
 .theme-dark .tab { color: #adb4bc; }
 .theme-dark .tab:first-child { border-right-color: #4a525b; }

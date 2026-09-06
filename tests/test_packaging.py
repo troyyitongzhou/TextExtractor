@@ -27,6 +27,24 @@ class PackagingTests(unittest.TestCase):
                 (package_root / relative_path).read_bytes(),
             )
 
+    def test_model_download_hint_is_contextual(self):
+        repository_root = Path(__file__).resolve().parents[1]
+        template = (repository_root / "templates/index.html").read_text(encoding="utf-8")
+        script = (repository_root / "static/app.js").read_text(encoding="utf-8")
+
+        self.assertIn(
+            'id="model-download-hint" class="status-hint hidden"',
+            template,
+        )
+        self.assertIn(
+            "value === 30 && job.stage === 'Transcribing with Apple GPU'",
+            script,
+        )
+        self.assertIn(
+            "modelDownloadHint.classList.toggle('hidden', !showModelDownloadHint)",
+            script,
+        )
+
     def test_cli_accepts_port_and_no_browser(self):
         args = server.build_parser().parse_args(["--port", "8899", "--no-browser"])
         self.assertEqual(args.port, 8899)
