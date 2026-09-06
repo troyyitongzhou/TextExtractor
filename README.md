@@ -4,6 +4,14 @@ TextExtractor turns audio-only Bilibili listening resources into readable transc
 
 It runs locally on Apple silicon using MLX Whisper and exports plain text, timestamped text, SRT, VTT, and JSON.
 
+<img src="docs/textextractor-ui.png" alt="TextExtractor interface" width="720">
+
+## Demo
+
+<img src="docs/textextractor-demo.gif" alt="TextExtractor usage demo" width="720">
+
+The demo uses synthetic transcript text and shows the basic workflow: enter a video URL, start extraction, monitor progress, review the transcript, and download the preferred output format.
+
 ## Requirements
 
 - An Apple silicon Mac
@@ -25,6 +33,8 @@ brew install ffmpeg
 Then open [http://127.0.0.1:8765](http://127.0.0.1:8765).
 
 The launcher creates a local Python 3.12 Conda environment and installs the required packages. The selected Whisper model is downloaded on first use.
+
+Paste a public Bilibili URL or choose a local media file, select the language and model, then click **Extract text**. When processing completes, copy the transcript or download it as TXT, timestamped TXT, SRT, VTT, or JSON.
 
 ## Models
 
