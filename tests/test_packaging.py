@@ -45,6 +45,58 @@ class PackagingTests(unittest.TestCase):
             script,
         )
 
+    def test_top_bar_controls_do_not_play_ui_sounds(self):
+        repository_root = Path(__file__).resolve().parents[1]
+        script = (repository_root / "static/app.js").read_text(encoding="utf-8")
+
+        self.assertIn(
+            "const silentUtilityButtons = new Set([soundButton, themeButton])",
+            script,
+        )
+        self.assertIn("if (silentUtilityButtons.has(button)) return", script)
+        self.assertNotIn("soundButton.addEventListener('pointerdown'", script)
+        self.assertIn("setMuted(!muted)", script)
+        self.assertIn(
+            "themeButton.addEventListener('click', () => setTheme(",
+            script,
+        )
+
+    def test_download_links_play_single_press_sound(self):
+        repository_root = Path(__file__).resolve().parents[1]
+        script = (repository_root / "static/app.js").read_text(encoding="utf-8")
+
+        self.assertIn("event.target.closest('.download-link')", script)
+        self.assertIn(
+            "downloadLinks.addEventListener('pointerdown', playDownloadActivation)",
+            script,
+        )
+        self.assertIn(
+            "downloadLinks.addEventListener('click', playDownloadActivation)",
+            script,
+        )
+        self.assertIn("event.type === 'click' && event.detail !== 0", script)
+
+    def test_download_hover_uses_an_ascending_tonal_scale(self):
+        repository_root = Path(__file__).resolve().parents[1]
+        script = (repository_root / "static/app.js").read_text(encoding="utf-8")
+
+        self.assertIn(
+            "downloadHoverFrequencies = [261.63, 293.66, 329.63, 392.0, 440.0]",
+            script,
+        )
+        self.assertIn("(job.downloads || []).forEach((item, index)", script)
+        self.assertIn(
+            "link.addEventListener('pointerenter', () => playDownloadHover(index))",
+            script,
+        )
+        self.assertIn("function playDownloadHover(index)", script)
+        self.assertIn("tone.type = 'sine'", script)
+        self.assertIn("if (muted) return", script)
+        self.assertEqual(
+            list(server.DOWNLOAD_LABELS),
+            ["txt", "timestamped", "srt", "vtt", "json"],
+        )
+
     def test_cli_accepts_port_and_no_browser(self):
         args = server.build_parser().parse_args(["--port", "8899", "--no-browser"])
         self.assertEqual(args.port, 8899)

@@ -27,6 +27,7 @@ let pollTimer = null;
 let audioContext = null;
 let muted = localStorage.getItem('transcript-sound') === 'muted';
 let lastHoverSoundAt = 0;
+const downloadHoverFrequencies = [261.63, 293.66, 329.63, 392.0, 440.0];
 
 function getAudioContext() {
   if (audioContext) return audioContext;
@@ -96,6 +97,25 @@ function playMechanicalClick() {
   emitMechanicalSound(.105, .052, 185);
 }
 
+function playDownloadHover(index) {
+  if (muted) return;
+  const frequency = downloadHoverFrequencies[index];
+  const context = getAudioContext();
+  if (!frequency || !context || context.state !== 'running') return;
+
+  const now = context.currentTime;
+  const tone = context.createOscillator();
+  const gain = context.createGain();
+  tone.type = 'sine';
+  tone.frequency.setValueAtTime(frequency, now);
+  gain.gain.setValueAtTime(.0001, now);
+  gain.gain.exponentialRampToValueAtTime(.032, now + .008);
+  gain.gain.exponentialRampToValueAtTime(.0001, now + .085);
+  tone.connect(gain).connect(context.destination);
+  tone.start(now);
+  tone.stop(now + .09);
+}
+
 function setMuted(nextMuted) {
   muted = nextMuted;
   soundButton.classList.toggle('muted', muted);
@@ -107,25 +127,28 @@ function setMuted(nextMuted) {
 
 setMuted(muted);
 document.addEventListener('pointerdown', () => { void unlockAudio(); }, { once: true, capture: true });
+const silentUtilityButtons = new Set([soundButton, themeButton]);
 document.querySelectorAll('.primary, .icon-button').forEach((button) => {
+  if (silentUtilityButtons.has(button)) return;
   button.addEventListener('pointerenter', playMechanicalHover);
-  if (button === soundButton) return;
   button.addEventListener('pointerdown', async () => {
     if (await unlockAudio()) playMechanicalClick();
   });
 });
-soundButton.addEventListener('pointerdown', async () => {
-  if (!muted && await unlockAudio()) playMechanicalClick();
-});
 soundButton.addEventListener('click', async () => {
   await unlockAudio();
-  if (muted) {
-    setMuted(false);
-    playMechanicalClick();
-  } else {
-    setMuted(true);
-  }
+  setMuted(!muted);
 });
+
+async function playDownloadActivation(event) {
+  const link = event.target.closest('.download-link');
+  if (!link || (event.type === 'pointerdown' && event.button !== 0)) return;
+  if (event.type === 'click' && event.detail !== 0) return;
+  if (await unlockAudio()) playMechanicalClick();
+}
+
+downloadLinks.addEventListener('pointerdown', playDownloadActivation);
+downloadLinks.addEventListener('click', playDownloadActivation);
 
 function setTheme(dark) {
   document.body.classList.toggle('theme-dark', dark);
@@ -285,11 +308,12 @@ function showResult(job, shouldScroll = true) {
     : '';
   resultMeta.textContent = `Language: ${job.language || 'Unknown'} · About ${minutes} min${confidence}`;
   downloadLinks.replaceChildren();
-  (job.downloads || []).forEach((item) => {
+  (job.downloads || []).forEach((item, index) => {
     const link = document.createElement('a');
     link.className = 'download-link';
     link.href = `/jobs/${job.id}/download/${item.format}`;
     link.textContent = `Download ${item.label}`;
+    link.addEventListener('pointerenter', () => playDownloadHover(index));
     downloadLinks.appendChild(link);
   });
   setSubmitting(false);
